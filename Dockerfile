@@ -33,6 +33,8 @@ RUN apt-get update \
 # For terminal sanity
     less \
     nano \
+# For hdf support in pandas
+    liblzo2-2 libaec0 libsnappy1v5 libgfortran5 libblosc1 libsz2 libhdf5-103 \
 # For pyenv per https://realpython.com/intro-to-pyenv/
 && curl https://pyenv.run | bash \
 && /root/.pyenv/bin/pyenv install 3.7.2 \
@@ -80,6 +82,14 @@ VOLUME /user
 # Home folder
 ADD files/bashrc /root/.bashrc
 ENV PATH="$HOME/.pyenv/bin:$PATH"
+
+# Nathans libs
+# pandas: pandas numpy matplotlib ipywidgets
+ADD files/requirements_pandas.txt /root/
+RUN /root/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_pandas.txt
+# more viz: seaborn plotly
+ADD files/requirements_more_viz.txt /root/
+RUN /root/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_more_viz.txt
 
 # Open port for jupyter server
 EXPOSE 8888
