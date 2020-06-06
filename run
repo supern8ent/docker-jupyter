@@ -1,0 +1,19 @@
+#!/bin/sh
+
+# Stop existing if necessary
+/usr/local/bin/docker stop docker-jupyter || True
+
+# Timezone fix from this discussion:
+# https://serverfault.com/questions/683605/docker-container-time-timezone-will-not-reflect-changes/683651
+/usr/local/bin/docker run \
+  -d \
+  --rm \
+  -p 8890:8888 \
+  --stop-signal=SIGRTMIN+3 \
+  --tmpfs /run:size=100M \
+  --tmpfs /run/lock:size=100M \
+  -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+  -v ~:/user \
+  -e TZ=`ls -la /etc/localtime | cut -d/ -f8-9` \
+  --name docker-jupyter \
+  docker-jupyter
