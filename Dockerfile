@@ -84,12 +84,15 @@ ADD files/bashrc /root/.bashrc
 ENV PATH="$HOME/.pyenv/bin:$PATH"
 
 # Nathans libs
-# pandas: pandas numpy matplotlib ipywidgets
+# pandas: pandas numpy scipy matplotlib ipywidgets
 ADD files/requirements_pandas.txt /root/
 RUN /root/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_pandas.txt
 # more viz: seaborn plotly
 ADD files/requirements_more_viz.txt /root/
 RUN /root/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_more_viz.txt
+# nathans oddities
+ADD files/requirements_nathan.txt /root/
+RUN /root/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_nathan.txt
 
 # Open port for jupyter server
 EXPOSE 8888
