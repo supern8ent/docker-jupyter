@@ -57,7 +57,7 @@ RUN apt-get update \
 && apt-get clean && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
 
 # Install Jupyter notebook
-ADD requirements_jupyter.txt /root/
+ADD files/requirements_jupyter.txt /root/
 RUN /root/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_jupyter.txt
 
 # Install Jupyterlab extensions
@@ -78,7 +78,7 @@ RUN mkdir /user
 VOLUME /user
 
 # Home folder
-ADD bashrc /root/.bashrc
+ADD files/bashrc /root/.bashrc
 ENV PATH="$HOME/.pyenv/bin:$PATH"
 
 # Open port for jupyter server
