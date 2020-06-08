@@ -132,6 +132,10 @@ RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirement
 ADD files/requirements_nathan.txt /root/
 RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_nathan.txt
 
+# More customizations
+ADD files/bash_aliases.txt /tmp/
+RUN cat /tmp/bash_aliases.txt >> $HOME/.bash_aliases
+
 # Open port for jupyter server
 EXPOSE 8888
 
