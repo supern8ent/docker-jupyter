@@ -1,4 +1,4 @@
 
 # per pyenv
 export PATH="$HOME/.pyenv/bin:$PATH"
-eval "$(pyenv init -)"
+# eval "$(pyenv init -)"  # wasn't working due to perms, but not needed anyway
