@@ -4,6 +4,7 @@
 FROM jgoerzen/debian-base-minimal:buster@sha256:6ec22e9274cccc1929124b141a389542542db8974f05a500e11923a2dbcc11a9
 
 ENV DEBIAN_FRONTEND noninteractive
+
 RUN apt-get update \
 && apt-get install -yq --no-install-recommends \
     wget \
@@ -11,7 +12,48 @@ RUN apt-get update \
     ca-certificates \
 #    sudo \
 #    fonts-liberation \
+&& apt-get clean && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
+
+# Configure environment (per jupyter docker stacks https://github.com/jupyter/docker-stacks)
+ENV SHELL=/bin/bash \
+    NB_USER="jovyan" \
+    NB_UID="1000" \
+    NB_GID="100" \
+    # LC_ALL=en_US.UTF-8 \
+    LANG=en_US.UTF-8 \
+    LANGUAGE=en_US.UTF-8
+ENV HOME=/home/$NB_USER
+
+# Add a script that we will use to correct permissions after running certain commands
+#  (per jupyter docker stacks https://github.com/jupyter/docker-stacks)
+ADD files/fix-permissions /usr/local/bin/fix-permissions
+
+# Enable prompt color in the skeleton .bashrc before creating the default NB_USER
+#  (per jupyter docker stacks https://github.com/jupyter/docker-stacks)
+RUN sed -i 's/^#force_color_prompt=yes/force_color_prompt=yes/' /etc/skel/.bashrc
+
+# Create NB_USER wtih name jovyan user with UID=1000 and in the 'users' group
+# and make sure these dirs are writable by the `users` group.
+#  (per jupyter docker stacks https://github.com/jupyter/docker-stacks)
+# RUN echo "auth requisite pam_deny.so" >> /etc/pam.d/su && \  # TODO
+#    sed -i.bak -e 's/^%admin/#%admin/' /etc/sudoers && \
+#    sed -i.bak -e 's/^%sudo/#%sudo/' /etc/sudoers && \
+RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
+    chmod g+w /etc/passwd && \
+    fix-permissions $HOME
+
+USER $NB_UID
+WORKDIR $HOME
+
+# Set up vm directory to mount host's user directory
+RUN mkdir /home/$NB_USER/user && \
+    fix-permissions /home/$NB_USER
+
+
 # For pyenv per https://realpython.com/intro-to-pyenv/
+USER root
+RUN apt-get update \
+&& apt-get install -yq --no-install-recommends \
     libssl-dev \
     zlib1g-dev \
     libbz2-dev \
@@ -37,8 +79,8 @@ RUN apt-get update \
     liblzo2-2 libaec0 libsnappy1v5 libgfortran5 libblosc1 libsz2 libhdf5-103 \
 # For pyenv per https://realpython.com/intro-to-pyenv/
 && curl https://pyenv.run | bash \
-&& /root/.pyenv/bin/pyenv install 3.7.2 \
-&& /root/.pyenv/bin/pyenv global 3.7.2 \
+&& $HOME/.pyenv/bin/pyenv install 3.7.2 \
+&& $HOME/.pyenv/bin/pyenv global 3.7.2 \
 # Now remove pyenv dependencies (cant be separate RUN command or else this won't shed weight)
 # NOTE: thus pyenv won't work in the vm
 && apt-get remove -yq --purge  binfmt-support fontconfig-config fonts-dejavu-core \
@@ -58,41 +100,37 @@ RUN apt-get update \
      xtrans-dev zlib1g-dev \
 && apt-get clean && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
 
+USER $NB_UID
+ADD files/bashrc_pyenv.txt /tmp/
+RUN cat /tmp/bashrc_pyenv.txt >> $HOME/.bashrc
+
 # Install Jupyter notebook
-ADD files/requirements_jupyter.txt /root/
-RUN /root/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_jupyter.txt
+USER root
+ADD files/requirements_jupyter.txt /tmp/
+RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /tmp/requirements_jupyter.txt
 
 # Install Jupyterlab extensions
-RUN curl -sL https://deb.nodesource.com/setup_13.x | bash -e \
+RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -e \
 && apt-get install -y nodejs \
-&& /root/.pyenv/shims/jupyter labextension install @jupyter-widgets/jupyterlab-manager@2.0 --no-build \
-&& /root/.pyenv/shims/jupyter labextension install jupyterlab-plotly@4.6.0 --no-build \
-&& /root/.pyenv/shims/jupyter labextension install plotlywidget@4.6.0 --no-build \
-&& /root/.pyenv/shims/jupyter labextension install ipyaggrid@0.2.1 --no-build \
+&& $HOME/.pyenv/shims/jupyter labextension install @jupyter-widgets/jupyterlab-manager@2.0 --no-build \
+&& $HOME/.pyenv/shims/jupyter labextension install jupyterlab-plotly@4.6.0 --no-build \
+&& $HOME/.pyenv/shims/jupyter labextension install plotlywidget@4.6.0 --no-build \
+&& $HOME/.pyenv/shims/jupyter labextension install ipyaggrid@0.2.1 --no-build \
 # Added --minimize=False per https://github.com/jupyterlab/jupyterlab/issues/7180 to fix problem with jupyterlab-plotly
-&& /root/.pyenv/shims/jupyter lab build --minimize=False --dev-build=False \
+&& $HOME/.pyenv/shims/jupyter lab build --minimize=False --dev-build=False \
 && npm cache clean --force \
-&& rm -rf /root/.pyenv/versions/3.7.2/share/jupyter/lab/staging \
+&& rm -rf $HOME/.pyenv/versions/3.7.2/share/jupyter/lab/staging \
 && rm -rf /usr/local/share/.cache
 
-# Set up vm directory to mount user directory on host
-RUN mkdir /user
-VOLUME /user
-
-# Home folder
-ADD files/bashrc /root/.bashrc
-ENV PATH="$HOME/.pyenv/bin:$PATH"
-
-# Nathans libs
 # pandas: pandas numpy scipy matplotlib ipywidgets
 ADD files/requirements_pandas.txt /root/
-RUN /root/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_pandas.txt
+RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_pandas.txt
 # more viz: seaborn plotly
 ADD files/requirements_more_viz.txt /root/
-RUN /root/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_more_viz.txt
+RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_more_viz.txt
 # nathans oddities
 ADD files/requirements_nathan.txt /root/
-RUN /root/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_nathan.txt
+RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_nathan.txt
 
 # Open port for jupyter server
 EXPOSE 8888
@@ -102,5 +140,9 @@ RUN find /root /usr -name 'cache' -exec du -sh \{\} \+ \
 && find /root /usr -name '.cache' -exec du -sh \{\} \+ \
 && find /root /usr -name 'staging' -exec du -sh \{\} \+
 
+USER $NB_UID
+
 # Launch the server
-CMD ["/root/.pyenv/shims/jupyter-notebook", "--allow-root", "--ip=0.0.0.0", "--port=8888", "--NotebookApp.password_required=False", "--NotebookApp.token='hummingsquadshoutdeze'"]
+CMD ["/home/jovyan/.pyenv/shims/jupyter-notebook", "--allow-root", "--ip=0.0.0.0", "--port=8888",\
+     "--notebook-dir=/home/jovyan/user", "--NotebookApp.password_required=False",\
+     "--NotebookApp.token='hummingsquadshoutdeze'"]

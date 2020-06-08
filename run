@@ -13,7 +13,7 @@
   --tmpfs /run:size=100M \
   --tmpfs /run/lock:size=100M \
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-  -v ~:/user \
+  -v ~:/home/jovyan/user \
   -e TZ=`ls -la /etc/localtime | cut -d/ -f8-9` \
   --name docker-jupyter \
   docker-jupyter
