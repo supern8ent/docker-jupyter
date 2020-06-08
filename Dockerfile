@@ -18,10 +18,11 @@ RUN apt-get update \
 ENV SHELL=/bin/bash \
     NB_USER="jovyan" \
     NB_UID="1000" \
-    NB_GID="100" \
+    NB_GID="100"
+    # Got 'perl: warning: Setting locale failed.'
     # LC_ALL=en_US.UTF-8 \
-    LANG=en_US.UTF-8 \
-    LANGUAGE=en_US.UTF-8
+    # LANG=en_US.UTF-8 \
+    # LANGUAGE=en_US.UTF-8
 ENV HOME=/home/$NB_USER
 
 # Add a script that we will use to correct permissions after running certain commands
@@ -98,7 +99,8 @@ RUN apt-get update \
      tcl-dev tcl8.6-dev tcl8.6 tcl tk-dev tk8.6-dev tk8.6 tk ucf uuid-dev \
      x11proto-core-dev x11proto-dev x11proto-scrnsaver-dev x11proto-xext-dev \
      xtrans-dev zlib1g-dev \
-&& apt-get clean && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/*
+&& apt-get clean && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* \
+&& find $HOME -exec chown $NB_UID \{\} \;
 
 USER $NB_UID
 ADD files/bashrc_pyenv.txt /tmp/
