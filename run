@@ -2,6 +2,7 @@
 
 # Stop existing if necessary
 /usr/local/bin/docker stop docker-jupyter || True
+sleep 1
 
 # Timezone fix from this discussion:
 # https://serverfault.com/questions/683605/docker-container-time-timezone-will-not-reflect-changes/683651
