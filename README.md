@@ -18,28 +18,31 @@ running vm is just a fossil. These pythons live in /root/.pyenv.
 First make a launcher using Automator > Run Shell Script > Paste following code, but change 
 `~/dev/jupyter/docker-jupyter/run` to the path to `run` command.
 
-    exitCode=0
-    attempt=1
-    timeout=1
-    while [ $attempt -le 6 ]
-    do
-        docker info
-        exitCode=$?
-        if [$exitCode == 0]
-        then
-            break
-        fi
-        echo "Failure: docker is not started. Will sleep then retry."
-        sleep $timeout
-        attempt=$(( attempt + 1 ))
-        timeout=$(( timeout * 2 ))
-    done
-    if [ $exitCode != 0 ]
-    then
-        echo "Docker never got started :( but will try to start jupyter anyways"
+```bash
+exitCode=0
+attempt=1
+timeout=1
+
+while [ $attempt -le 6 ]; do
+    /usr/local/bin/docker info
+    exitCode=$?
+
+    if [ $exitCode -eq 0 ]; then
+	    break
     fi
-    
-    ~/dev/jupyter/docker-jupyter/run
+
+    echo "Failure: docker is not started. Will sleep then retry."
+    sleep $timeout
+    attempt=$(( attempt + 1 ))
+    timeout=$(( timeout * 2 ))
+done
+
+if [ $exitCode != 0 ]; then
+    echo "Docker never got started :( but will try to start jupyter anyways"
+fi
+
+~/dev/jupyter/docker-jupyter/run
+```
 
 Next, go to System Preferences > Users & Groups > Login Items and add your Automator.
 
