@@ -10,7 +10,7 @@ running vm is just a fossil. These pythons live in /root/.pyenv.
 * `./build` to docker build it
 * `./run` to launch the docker vm
 * Jupyter will be available at localhost:8890
-    * Suggest bookmarking `localhost:8890/lab/tree/user?token=hummingsquadshoutdeze` to start jupyterlab in your home folder.
+    * Suggest bookmarking `localhost:8890/lab?token=hummingsquadshoutdeze` to start jupyterlab in your home folder.
     * Your home folder is mounted at `/home/jovyan/user` within the vm.
 * `./hackin` to get a root terminal on the running vm
 
