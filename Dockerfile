@@ -134,6 +134,10 @@ RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirement
 ADD files/requirements_nathan.txt /root/
 RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_nathan.txt
 
+# JupyterLab settings
+ADD files/plugin.jupyterlab-settings $HOME/.jupyter/lab/user-settings/@jupyterlab/fileeditor-extension/
+ADD files/tracker.jupyterlab-settings $HOME/.jupyter/lab/user-settings/@jupyterlab/notebook-extension/
+
 # More customizations
 ADD files/bash_aliases.txt /tmp/
 RUN cat /tmp/bash_aliases.txt >> $HOME/.bash_aliases
