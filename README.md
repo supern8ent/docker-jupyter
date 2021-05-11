@@ -61,12 +61,6 @@ Next, go to System Preferences > Users & Groups > Login Items and add your Autom
 * https://hub.docker.com/r/eipdev/alpine-jupyter-notebook/
 * https://hub.docker.com/r/janikarh/alpine-jupyter/
 
-## Debian-minimal 
-
-* https://github.com/jgoerzen/docker-debian-base-minimal
-* https://changelog.complete.org/archives/9794-fixing-the-problems-with-docker-images
-* https://hub.docker.com/r/jgoerzen/debian-base-minimal
-
 ## Pyenv
 
 * https://realpython.com/intro-to-pyenv/
