@@ -6,13 +6,14 @@ sleep 1
 
 # Timezone fix from this discussion:
 # https://serverfault.com/questions/683605/docker-container-time-timezone-will-not-reflect-changes/683651
+# Change/add bind mounts using the -v option so you can work directly on stuff in your filesystem
 /usr/local/bin/docker run \
   -d \
   --rm \
   -p 8890:8888 \
   --stop-signal=SIGRTMIN+3 \
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
-  -v ~:/home/jovyan/user \
+  -v ~/dev:/home/jovyan/user/dev \
   -e TZ=`ls -la /etc/localtime | cut -d/ -f8-9` \
   --name docker-jupyter \
   docker-jupyter

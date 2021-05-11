@@ -46,7 +46,7 @@ RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
 USER $NB_UID
 WORKDIR $HOME
 
-# Set up vm directory to mount host's user directory
+# Set up vm directory to mount *some things from* host's user directory
 RUN mkdir /home/$NB_USER/user && \
     fix-permissions /home/$NB_USER
 
