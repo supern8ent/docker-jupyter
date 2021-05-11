@@ -103,8 +103,6 @@ RUN apt-get update \
 && find $HOME -exec chown $NB_UID \{\} \;
 
 USER $NB_UID
-ADD files/bashrc_pyenv.txt /tmp/
-RUN cat /tmp/bashrc_pyenv.txt >> $HOME/.bashrc
 
 # Install Jupyter notebook
 USER root
