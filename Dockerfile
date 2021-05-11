@@ -1,7 +1,7 @@
 # https://github.com/jgoerzen/docker-debian-base-minimal
 # https://changelog.complete.org/archives/9794-fixing-the-problems-with-docker-images
 # https://hub.docker.com/r/jgoerzen/debian-base-minimal
-FROM jgoerzen/debian-base-minimal:buster@sha256:6ec22e9274cccc1929124b141a389542542db8974f05a500e11923a2dbcc11a9
+FROM debian:buster
 
 ENV DEBIAN_FRONTEND noninteractive
 

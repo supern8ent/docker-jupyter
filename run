@@ -11,8 +11,6 @@ sleep 1
   --rm \
   -p 8890:8888 \
   --stop-signal=SIGRTMIN+3 \
-  --tmpfs /run:size=100M \
-  --tmpfs /run/lock:size=100M \
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
   -v ~:/home/jovyan/user \
   -e TZ=`ls -la /etc/localtime | cut -d/ -f8-9` \
