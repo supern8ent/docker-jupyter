@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Stop existing if necessary
+/usr/local/bin/docker stop docker-jupyter || True
