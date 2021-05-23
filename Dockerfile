@@ -136,6 +136,14 @@ RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirement
 ADD files/plugin.jupyterlab-settings $HOME/.jupyter/lab/user-settings/@jupyterlab/fileeditor-extension/
 ADD files/tracker.jupyterlab-settings $HOME/.jupyter/lab/user-settings/@jupyterlab/notebook-extension/
 
+# Script to start the notebook server
+ADD files/start_jupyter.sh /home/
+RUN chown $NB_UID /home/start_jupyter.sh
+
+# File containing user's custom token
+ADD token.txt /home/token.txt
+RUN chown $NB_UID /home/token.txt
+
 # More customizations
 ADD files/bash_aliases.txt /tmp/
 RUN cat /tmp/bash_aliases.txt >> $HOME/.bash_aliases
@@ -151,6 +159,4 @@ RUN find /root /usr -name 'cache' -exec du -sh \{\} \+ \
 USER $NB_UID
 
 # Launch the server
-CMD ["/home/jovyan/.pyenv/shims/jupyter-notebook", "--allow-root", "--ip=0.0.0.0", "--port=8888",\
-     "--notebook-dir=/home/jovyan/user", "--NotebookApp.password_required=False",\
-     "--NotebookApp.token='hummingsquadshoutdeze'"]
+CMD ["/home/start_jupyter.sh"]
