@@ -13,8 +13,14 @@ running vm is just a fossil. These pythons live in /root/.pyenv.
 * `./run` to launch the docker vm
 * Jupyter will be available at localhost:8890
     * Suggest entering your token in the dialog and letting your browser remember it for you (alternatively, bookmark `localhost:8890/lab?token=hummingsquadshoutdeze` (replace token with your token))
-    * By default your `~/dev` folder will be bind mounted at `/home/jovyan/user/dev` within the container. Add/change what gets
-      mounted by modifying the bash script named `run`.
+* Jupyter starts with access only to the `/home/jovyan/user` directory, and you will not have edit rights to this 
+    directory. See the next point about mounting host directories so you can do work *outside* the container's 
+    temporary filesystem.  
+    (Yes this is sub-optimal. The original way this worked was that the host's entire home 
+    directory was mounted at `/home/jovyan/user`, but either docker or Apple changed something around the beginning of 
+    2021 and now Docker flips out if you do that.)
+* By default your `~/dev` folder will be bind mounted at `/home/jovyan/user/dev` within the container. Add/change what gets
+mounted by modifying the bash script named `run`.
 * `./hackin` to get a root terminal on the running container
 * `./stop` to stop the running container
 
