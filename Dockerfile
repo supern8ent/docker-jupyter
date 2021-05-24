@@ -46,10 +46,6 @@ RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
 USER $NB_UID
 WORKDIR $HOME
 
-# Set up vm directory to mount *some things from* host's user directory
-RUN mkdir /home/$NB_USER/user && \
-    fix-permissions /home/$NB_USER
-
 
 # For pyenv per https://realpython.com/intro-to-pyenv/
 USER root
@@ -147,6 +143,11 @@ RUN chown $NB_UID /home/token.txt
 # More customizations
 ADD files/bash_aliases.txt /tmp/
 RUN cat /tmp/bash_aliases.txt >> $HOME/.bash_aliases
+
+# Set up vm directory to mount *some things from* host's user directory
+RUN mkdir /home/$NB_USER/user && \
+    fix-permissions /home/$NB_USER && \
+    chmod a-w /home/$NB_USER/user
 
 # Open port for jupyter server
 EXPOSE 8888
