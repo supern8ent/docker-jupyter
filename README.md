@@ -26,7 +26,7 @@ mounted by modifying the bash script named `run`.
 
 ## Start automatically on Mac OS X
 
-First make a launcher using Automator > Run Shell Script > Paste following code, but change 
+First make a launcher using Automator > New > Application > Run Shell Script > Paste following code, but change 
 `~/dev/jupyter/docker-jupyter/run` to the path to `run` command.
 
 ```bash
