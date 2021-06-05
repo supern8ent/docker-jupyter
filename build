@@ -1,3 +1,3 @@
 #!/bin/sh
 
-/usr/local/bin/docker build -t docker-jupyter .
+/usr/local/bin/docker build -t new-docker-jupyter .

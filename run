@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # Stop existing if necessary
-/usr/local/bin/docker stop docker-jupyter || True
+/usr/local/bin/docker stop new-docker-jupyter || True
 sleep 1
 
 # Timezone fix from this discussion:
@@ -15,5 +15,5 @@ sleep 1
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
   -v ~/dev:/home/jovyan/user/dev \
   -e TZ=`ls -la /etc/localtime | cut -d/ -f8-9` \
-  --name docker-jupyter \
-  docker-jupyter
+  --name new-docker-jupyter \
+  new-docker-jupyter
