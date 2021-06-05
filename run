@@ -14,6 +14,7 @@ sleep 1
   --stop-signal=SIGRTMIN+3 \
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
   -v ~/dev:/home/jovyan/user/dev \
+  -v ~/GDrive:/home/jovyan/user/GDrive \
   -e TZ=`ls -la /etc/localtime | cut -d/ -f8-9` \
   --name docker-jupyter \
   docker-jupyter
