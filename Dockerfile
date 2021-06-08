@@ -118,7 +118,7 @@ RUN cat /tmp/bashrc_poetry.txt >> $HOME/.bashrc
 USER $NB_UID
 RUN mkdir $HOME/.environments \
 && mkdir $HOME/.environments/jupyter
-ADD files/jupyter/* $HOME/.environments/jupyter
+ADD --chown=$NB_UID files/jupyter/* $HOME/.environments/jupyter
 RUN /bin/bash $HOME/.environments/jupyter/make_jupyter_env.bash
 
 ## Install Jupyter notebook
