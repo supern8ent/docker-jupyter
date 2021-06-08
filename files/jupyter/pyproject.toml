@@ -7,6 +7,9 @@ authors = ["Your Name <you@example.com>"]
 [tool.poetry.dependencies]
 python = "^3.8"
 jupyterlab = "^3.0.16"
+voila = "^0.2.10"
+lckr-jupyterlab-variableinspector = "^3.0.9"
+ipywidgets = "^7.6.3"
 
 [tool.poetry.dev-dependencies]
 
