@@ -5,6 +5,10 @@ Builds a docker image that you can run and access locally.
 Python is installed via pyenv, but then, to save space, pyenv's dependencies are removed, so pyenv in the 
 running vm is just a fossil. These pythons live in /root/.pyenv.
 
+Jupyter is installed in a poetry environment. Another poetry environment containing common data science libraries is 
+also installed, and its kernel is registered with Jupyter. These environments are installed in 
+/home/jovyan/.environments.
+
 # Using it
 
 * Add a `token.txt` file to the base directory (next to Dockerfile).  
