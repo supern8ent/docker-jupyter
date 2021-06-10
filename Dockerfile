@@ -135,34 +135,6 @@ RUN /bin/bash /tmp/make_env.bash 3.8.10 py38a \
 && /bin/bash /tmp/register_kernel.bash 3.8.10 py38a \
 && rm -rf /home/jovyan/.cache/pip/* && rm -rf /home/jovyan/.cache/pypoetry/*
 
-## Install Jupyter notebook
-#USER root
-#ADD files/requirements_jupyter.txt /tmp/
-#RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /tmp/requirements_jupyter.txt
-#
-## Install Jupyterlab extensions
-#RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -e \
-#&& apt-get install -y nodejs \
-#&& $HOME/.pyenv/shims/jupyter labextension install @jupyter-widgets/jupyterlab-manager@2.0 --no-build \
-#&& $HOME/.pyenv/shims/jupyter labextension install jupyterlab-plotly@4.6.0 --no-build \
-#&& $HOME/.pyenv/shims/jupyter labextension install plotlywidget@4.6.0 --no-build \
-#&& $HOME/.pyenv/shims/jupyter labextension install ipyaggrid@0.2.1 --no-build \
-## Added --minimize=False per https://github.com/jupyterlab/jupyterlab/issues/7180 to fix problem with jupyterlab-plotly
-#&& $HOME/.pyenv/shims/jupyter lab build --minimize=False --dev-build=False \
-#&& npm cache clean --force \
-#&& rm -rf $HOME/.pyenv/versions/3.7.2/share/jupyter/lab/staging \
-#&& rm -rf /usr/local/share/.cache
-#
-## pandas: pandas numpy scipy matplotlib ipywidgets
-#ADD files/requirements_pandas.txt /root/
-#RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_pandas.txt
-## more viz: seaborn plotly
-#ADD files/requirements_more_viz.txt /root/
-#RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_more_viz.txt
-## nathans oddities
-#ADD files/requirements_nathan.txt /root/
-#RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_nathan.txt
-
 USER root
 
 # JupyterLab settings
