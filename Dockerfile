@@ -76,8 +76,9 @@ RUN apt-get update \
     liblzo2-2 libaec0 libsnappy1v5 libgfortran5 libblosc1 libsz2 libhdf5-103 \
 # For pyenv per https://realpython.com/intro-to-pyenv/
 && curl https://pyenv.run | bash \
-&& $HOME/.pyenv/bin/pyenv install 3.7.2 \
-&& $HOME/.pyenv/bin/pyenv global 3.7.2 \
+&& $HOME/.pyenv/bin/pyenv install 3.8.10 \
+&& $HOME/.pyenv/bin/pyenv global 3.8.10 \
+&& $HOME/.pyenv/bin/pyenv install 3.9.5 \
 # Now remove pyenv dependencies (cant be separate RUN command or else this won't shed weight)
 # NOTE: thus pyenv won't work in the vm
 && apt-get remove -yq --purge  binfmt-support fontconfig-config fonts-dejavu-core \
@@ -98,35 +99,43 @@ RUN apt-get update \
 && apt-get clean && rm -rf /var/lib/apt/lists/* && rm -rf /tmp/* \
 && find $HOME -exec chown $NB_UID \{\} \;
 
+# Pyenv command line
+ADD files/bashrc_pyenv.txt /tmp/
+RUN cat /tmp/bashrc_pyenv.txt >> $HOME/.bashrc
+
+# https://github.com/python-poetry/poetry/discussions/1879
+# https://github.com/michael0liver/python-poetry-docker-example/blob/master/docker/Dockerfile
+# Install Poetry - respects $POETRY_VERSION & $POETRY_HOME
 USER $NB_UID
+ENV POETRY_VERSION=1.1.6
+RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | $HOME/.pyenv/shims/python
 
-# Install Jupyter notebook
+# Add a script that sets up poetry environments
+ADD files/make_env.bash /tmp/
+# Add a script that registers a poetry environment's kernel to jupyter
+ADD files/register_kernel.bash /tmp/
+
+# Poetry command line
+ADD files/bashrc_poetry.txt /tmp/
+RUN cat /tmp/bashrc_poetry.txt >> $HOME/.bashrc
+
+# Install JupyterLab in its own poetry environment
+USER $NB_UID
+RUN mkdir $HOME/.environments \
+&& mkdir $HOME/.environments/jupyter
+ADD --chown=$NB_UID files/jupyter/* $HOME/.environments/jupyter
+RUN /bin/bash /tmp/make_env.bash 3.8.10 jupyter \
+&& rm -rf /home/jovyan/.cache/pip/* && rm -rf /home/jovyan/.cache/pypoetry/*
+
+# Set up a poetry environment at python 3.8
+USER $NB_UID
+RUN mkdir $HOME/.environments/py38a
+ADD --chown=$NB_UID files/py38a/* $HOME/.environments/py38a
+RUN /bin/bash /tmp/make_env.bash 3.8.10 py38a \
+&& /bin/bash /tmp/register_kernel.bash 3.8.10 py38a \
+&& rm -rf /home/jovyan/.cache/pip/* && rm -rf /home/jovyan/.cache/pypoetry/*
+
 USER root
-ADD files/requirements_jupyter.txt /tmp/
-RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /tmp/requirements_jupyter.txt
-
-# Install Jupyterlab extensions
-RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -e \
-&& apt-get install -y nodejs \
-&& $HOME/.pyenv/shims/jupyter labextension install @jupyter-widgets/jupyterlab-manager@2.0 --no-build \
-&& $HOME/.pyenv/shims/jupyter labextension install jupyterlab-plotly@4.6.0 --no-build \
-&& $HOME/.pyenv/shims/jupyter labextension install plotlywidget@4.6.0 --no-build \
-&& $HOME/.pyenv/shims/jupyter labextension install ipyaggrid@0.2.1 --no-build \
-# Added --minimize=False per https://github.com/jupyterlab/jupyterlab/issues/7180 to fix problem with jupyterlab-plotly
-&& $HOME/.pyenv/shims/jupyter lab build --minimize=False --dev-build=False \
-&& npm cache clean --force \
-&& rm -rf $HOME/.pyenv/versions/3.7.2/share/jupyter/lab/staging \
-&& rm -rf /usr/local/share/.cache
-
-# pandas: pandas numpy scipy matplotlib ipywidgets
-ADD files/requirements_pandas.txt /root/
-RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_pandas.txt
-# more viz: seaborn plotly
-ADD files/requirements_more_viz.txt /root/
-RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_more_viz.txt
-# nathans oddities
-ADD files/requirements_nathan.txt /root/
-RUN $HOME/.pyenv/shims/pip install --no-cache-dir --no-deps -r /root/requirements_nathan.txt
 
 # JupyterLab settings
 ADD files/plugin.jupyterlab-settings $HOME/.jupyter/lab/user-settings/@jupyterlab/fileeditor-extension/
@@ -146,7 +155,7 @@ RUN cat /tmp/bash_aliases.txt >> $HOME/.bash_aliases
 
 # Set up vm directory to mount *some things from* host's user directory
 RUN mkdir /home/$NB_USER/user && \
-    fix-permissions /home/$NB_USER && \
+    fix-permissions /home/$NB_USER/user && \
     chmod a-w /home/$NB_USER/user
 
 # Open port for jupyter server
