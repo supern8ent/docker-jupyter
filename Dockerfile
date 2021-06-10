@@ -110,16 +110,30 @@ USER $NB_UID
 ENV POETRY_VERSION=1.1.6
 RUN curl -sSL https://raw.githubusercontent.com/sdispater/poetry/master/get-poetry.py | $HOME/.pyenv/shims/python
 
+# Add a script that sets up poetry environments
+ADD files/make_env.bash /tmp/
+# Add a script that registers a poetry environment's kernel to jupyter
+ADD files/register_kernel.bash /tmp/
+
 # Poetry command line
 ADD files/bashrc_poetry.txt /tmp/
 RUN cat /tmp/bashrc_poetry.txt >> $HOME/.bashrc
 
-# Install JupyterLab
+# Install JupyterLab in its own poetry environment
 USER $NB_UID
 RUN mkdir $HOME/.environments \
 && mkdir $HOME/.environments/jupyter
 ADD --chown=$NB_UID files/jupyter/* $HOME/.environments/jupyter
-RUN /bin/bash $HOME/.environments/jupyter/make_jupyter_env.bash
+RUN /bin/bash /tmp/make_env.bash 3.8.10 jupyter \
+&& rm -rf /home/jovyan/.cache/pip/* && rm -rf /home/jovyan/.cache/pypoetry/*
+
+# Set up a poetry environment at python 3.8
+USER $NB_UID
+RUN mkdir $HOME/.environments/py38a
+ADD --chown=$NB_UID files/py38a/* $HOME/.environments/py38a
+RUN /bin/bash /tmp/make_env.bash 3.8.10 py38a \
+&& /bin/bash /tmp/register_kernel.bash 3.8.10 py38a \
+&& rm -rf /home/jovyan/.cache/pip/* && rm -rf /home/jovyan/.cache/pypoetry/*
 
 ## Install Jupyter notebook
 #USER root
