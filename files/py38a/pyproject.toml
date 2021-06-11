@@ -24,6 +24,8 @@ more-itertools = "^8.8.0"
 fuzzywuzzy = "^0.18.0"
 matplotlib-venn = "^0.11.6"
 python-Levenshtein = "^0.12.2"
+ipywidgets = "^7.6.3"
+requests = "^2.25.1"
 
 [tool.poetry.dev-dependencies]
 
