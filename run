@@ -15,6 +15,7 @@ sleep 1
   -v /sys/fs/cgroup:/sys/fs/cgroup:ro \
   -v ~/dev:/home/jovyan/user/dev \
   -v ~/GDrive:/home/jovyan/user/GDrive \
+  -v ~/Downloads:/home/jovyan/user/Downloads \
   -e TZ=`ls -la /etc/localtime | cut -d/ -f8-9` \
   --name docker-jupyter \
   docker-jupyter
