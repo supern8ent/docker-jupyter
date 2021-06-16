@@ -132,7 +132,15 @@ USER $NB_UID
 RUN mkdir $HOME/.environments/py38a
 ADD --chown=$NB_UID files/py38a/* $HOME/.environments/py38a
 RUN /bin/bash /tmp/make_env.bash 3.8.10 py38a \
-&& /bin/bash /tmp/register_kernel.bash 3.8.10 py38a \
+&& /bin/bash /tmp/register_kernel.bash 3.8.10 py38a py38a py38a \
+&& rm -rf /home/jovyan/.cache/pip/* && rm -rf /home/jovyan/.cache/pypoetry/*
+
+# Set up a poetry environment at python 3.9
+USER $NB_UID
+RUN mkdir $HOME/.environments/py39a
+ADD --chown=$NB_UID files/py39a/* $HOME/.environments/py39a
+RUN /bin/bash /tmp/make_env.bash 3.9.5 py39a \
+&& /bin/bash /tmp/register_kernel.bash 3.9.5 py39a py39a py39a \
 && rm -rf /home/jovyan/.cache/pip/* && rm -rf /home/jovyan/.cache/pypoetry/*
 
 USER root
